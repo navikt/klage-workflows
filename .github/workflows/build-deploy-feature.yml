@@ -1,0 +1,23 @@
+name: Build, deploy feature
+
+on:
+  workflow_call:
+    inputs:
+      nav-cluster:
+        required: false
+        type: string
+        description: Nais cluster in dev to deploy to
+        default: 'dev-gcp'
+
+jobs:
+  build-feature:
+    uses: navikt/dok-workflows/.github/workflows/build-app-gar.yml@main
+    secrets: inherit
+  deploy-feature:
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    uses: navikt/dok-workflows/.github/workflows/deploy-all-dev.yml@main
+    needs: build-feature
+    secrets: inherit
+    with:
+      image: ${{ needs.build-feature.outputs.image }}
+      nav-cluster: ${{ inputs.nav-cluster }}

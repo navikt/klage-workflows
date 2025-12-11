@@ -1,0 +1,20 @@
+name: Deploy build-tag to prod-<cluster>
+
+on:
+  workflow_call:
+    inputs:
+      nav-cluster:
+        required: false
+        type: string
+        description: Nais cluster in p to deploy to
+        default: 'prod-gcp'
+
+jobs:
+  deploy-to-prod:
+    uses: navikt/dok-workflows/.github/workflows/deploy-nais-app.yml@main
+    with:
+#      TODO
+      image: europe-north1-docker.pkg.dev/nais-management-233d/teamdokumenthandtering/${{ github.event.repository.name }}:${{ github.event.release.tag_name }}
+      nav-cluster: ${{ inputs.nav-cluster }}
+      nav-environment: p
+    secrets: inherit
