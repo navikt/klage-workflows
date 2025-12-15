@@ -1,0 +1,25 @@
+name: Deploy build-tag to all environments in dev-<cluster>
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+      nav-cluster:
+        required: false
+        type: string
+        description: Nais cluster in dev to deploy to
+        default: 'dev-gcp'
+
+jobs:
+  deploy-to-dev:
+    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
+    strategy:
+      matrix:
+        environment: [dev]
+    with:
+      image: ${{ inputs.image }}
+      nav-cluster: ${{ inputs.nav-cluster }}
+      nav-environment: ${{ matrix.environment }}
+    secrets: inherit

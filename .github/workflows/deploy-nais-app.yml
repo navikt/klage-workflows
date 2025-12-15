@@ -1,0 +1,33 @@
+on:
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+      nav-cluster:
+        required: true
+        type: string
+      nav-environment:
+        required: true
+        type: string
+
+jobs:
+  deploy-nais-app:
+    name: Deploy to ${{ inputs.nav-environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: ${{ inputs.nav-cluster }}
+          RESOURCE: nais/nais.yaml
+          VARS: nais/${{ inputs.nav-environment }}-config.yaml
+          VAR: image=${{ inputs.image }}
+      - name: Post failures to Slack
+        if: failure()
+        run: |
+          curl -X POST --data-urlencode "payload={\"channel\": \"$CHANNEL\", \"text\": \"$MESSAGE\", \"icon_emoji\": \":ghost:\"}" $WEBHOOK_URL
+        env:
+          MESSAGE: "Deploy til dev feilet"
+          CHANNEL: "#klage-notifications"
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}

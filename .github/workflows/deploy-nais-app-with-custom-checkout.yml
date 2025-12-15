@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      build-tag:
+        required: true
+        type: string
+      nav-cluster:
+        required: true
+        type: string
+      nav-environment:
+        required: true
+        type: string
+
+jobs:
+  deploy-nais-app:
+    name: Deploy to ${{ inputs.nav-environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.build-tag }}
+          sparse-checkout: |
+            nais/**
+          sparse-checkout-cone-mode: false
+      # sanity check
+      - name: Check if nais/${{ inputs.nav-environment }}-config.yaml exists
+        id: check-yaml
+        run: echo "file-exists=$(test -f nais/${{ inputs.nav-environment }}-config.yaml && echo 'config_exists' || echo 'config_not_exists')" >> $GITHUB_OUTPUT
+      - uses: nais/deploy/actions/deploy@v2
+        if: ${{ steps.check-json.outputs.file-exists == 'config_exists' }}
+        env:
+          CLUSTER: ${{ inputs.nav-cluster }}
+          RESOURCE: deploy/nais.yaml
+          VARS: nais/${{ inputs.nav-environment }}-config.yaml
+          VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ inputs.build-tag }}
+      - name: No config files detected - unable to deploy
+        if: ${{ steps.check-yaml.outputs.file-exists != 'config_exists' }}
+        run: echo "::warning title=Unable to deploy::Could not find nais/${{ inputs.nav-environment }}-config.yaml"

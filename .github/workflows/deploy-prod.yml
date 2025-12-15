@@ -1,0 +1,22 @@
+name: Deploy build-tag to prod-<cluster>
+
+on:
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+      nav-cluster:
+        required: false
+        type: string
+        description: Nais cluster in prod to deploy to
+        default: 'prod-gcp'
+
+jobs:
+  deploy-to-prod:
+    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
+    with:
+      image: ${{ inputs.image }}
+      nav-cluster: ${{ inputs.nav-cluster }}
+      nav-environment: prod
+    secrets: inherit
