@@ -23,17 +23,16 @@ jobs:
             nais/**
           sparse-checkout-cone-mode: false
       # sanity check
-#      TODO
-      - name: Check if nais/${{ inputs.nav-environment }}-config.json exists
-        id: check-json
-        run: echo "file-exists=$(test -f nais/${{ inputs.nav-environment }}-config.json && echo 'config_exists' || echo 'config_not_exists')" >> $GITHUB_OUTPUT
+      - name: Check if nais/${{ inputs.nav-environment }}-config.yaml exists
+        id: check-yaml
+        run: echo "file-exists=$(test -f nais/${{ inputs.nav-environment }}-config.yaml && echo 'config_exists' || echo 'config_not_exists')" >> $GITHUB_OUTPUT
       - uses: nais/deploy/actions/deploy@v2
         if: ${{ steps.check-json.outputs.file-exists == 'config_exists' }}
         env:
           CLUSTER: ${{ inputs.nav-cluster }}
           RESOURCE: deploy/nais.yaml
-          VARS: nais/${{ inputs.nav-environment }}-config.json
-          VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/teamdokumenthandtering/${{ github.event.repository.name }}:${{ inputs.build-tag }}
+          VARS: nais/${{ inputs.nav-environment }}-config.yaml
+          VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ inputs.build-tag }}
       - name: No config files detected - unable to deploy
-        if: ${{ steps.check-json.outputs.file-exists != 'config_exists' }}
-        run: echo "::warning title=Unable to deploy::Could not find nais/${{ inputs.nav-environment }}-config.json"
+        if: ${{ steps.check-yaml.outputs.file-exists != 'config_exists' }}
+        run: echo "::warning title=Unable to deploy::Could not find nais/${{ inputs.nav-environment }}-config.yaml"

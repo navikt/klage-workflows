@@ -11,10 +11,18 @@ on:
 
 jobs:
   build-main:
-    uses: navikt/dok-workflows/.github/workflows/build-app.yml@main
+    uses: navikt/klage-workflows/.github/workflows/build-app.yml@main
     secrets: inherit
-  deploy-main:
-    uses: navikt/dok-workflows/.github/workflows/deploy-all-dev.yml@main
+  deploy-main-to-dev:
+    uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yml@main
+    needs: build-main
+    secrets: inherit
+    with:
+      image: ${{ needs.build-main.outputs.image }}
+      nav-cluster: ${{ inputs.nav-cluster }}
+
+  deploy-main-to-prod:
+    uses: navikt/klage-workflows/.github/workflows/deploy-prod.yml@main
     needs: build-main
     secrets: inherit
     with:

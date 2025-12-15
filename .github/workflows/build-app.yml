@@ -3,9 +3,6 @@ name: Build app
 on:
   workflow_call:
     outputs:
-      tag:
-        description: "Build tag"
-        value: ${{ jobs.build-app.outputs.tag }}
       image:
         description: "Image"
         value: ${{ jobs.build-app.outputs.image }}
@@ -18,7 +15,6 @@ jobs:
       contents: read
       id-token: write
     outputs:
-      tag: ${{ steps.docker-build-push.outputs.tag }}
       image: ${{ steps.docker-build-push.outputs.image }}
     steps:
       - name: Checkout code
