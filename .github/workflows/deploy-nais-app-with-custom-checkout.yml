@@ -25,11 +25,9 @@ jobs:
       # sanity check
       - name: Check if nais/${{ inputs.nav-environment }}-config.yaml exists
         id: check-yaml
-        run: |
-          echo "file-exists=$(test -f nais/${{ inputs.nav-environment }}-config.yaml && echo 'config_exists' || echo 'config_not_exists')" >> $GITHUB_OUTPUT
-          cat $GITHUB_OUTPUT
+        run: echo "file-exists=$(test -f nais/${{ inputs.nav-environment }}-config.yaml && echo 'config_exists' || echo 'config_not_exists')" >> $GITHUB_OUTPUT
       - uses: nais/deploy/actions/deploy@v2
-        if: ${{ steps.check-json.outputs.file-exists == 'config_exists' }}
+        if: ${{ steps.check-yaml.outputs.file-exists == 'config_exists' }}
         env:
           CLUSTER: ${{ inputs.nav-cluster }}
           RESOURCE: nais/nais.yaml
