@@ -30,7 +30,7 @@ jobs:
         if: ${{ steps.check-json.outputs.file-exists == 'config_exists' }}
         env:
           CLUSTER: ${{ inputs.nav-cluster }}
-          RESOURCE: deploy/nais.yaml
+          RESOURCE: nais/nais.yaml
           VARS: nais/${{ inputs.nav-environment }}-config.yaml
           VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ inputs.build-tag }}
       - name: No config files detected - unable to deploy
