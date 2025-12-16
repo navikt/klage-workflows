@@ -1,30 +1,60 @@
-name: Build, deploy feature
+name: Build, deploy to e2e, run e2e, deploy to all dev envs and prod
 
 on:
   workflow_call:
-    inputs:
-      nav-cluster:
-        required: false
-        type: string
-        description: Nais cluster in dev to deploy to
-        default: 'dev-gcp'
 
 jobs:
   build-main:
     uses: navikt/klage-workflows/.github/workflows/build-app.yml@main
     secrets: inherit
 
-  deploy-main-to-dev:
-    uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yml@main
+  deploy-main-to-e2e:
+    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
     needs: build-main
+    with:
+      image: ${{ inputs.image }}
+      nav-cluster: dev-gcp
+      nav-environment: e2e
+    secrets: inherit
+
+  kabal-e2e-tests:
+    name: E2E
+    needs: deploy-main-to-e2e
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/kabal-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: ${{ inputs.e2e_tag }}
+
+  kaka-e2e-tests:
+    name: E2E
+    needs: deploy-main-to-e2e
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/kaka-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: ${{ inputs.e2e_tag }}
+
+  deploy-main-to-dev-envs:
+    uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yml@main
+    needs: [kabal-e2e-tests, kaka-e2e-tests]
     secrets: inherit
     with:
       image: ${{ needs.build-main.outputs.image }}
-      nav-cluster: ${{ inputs.nav-cluster }}
 
   deploy-main-to-prod:
     uses: navikt/klage-workflows/.github/workflows/deploy-prod.yml@main
-    needs: build-main
+    needs: [kabal-e2e-tests, kaka-e2e-tests]
     secrets: inherit
     with:
       tag: ${{ needs.build-main.outputs.tag }}
