@@ -12,7 +12,7 @@ jobs:
     uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
     needs: build-main
     with:
-      image: ${{ inputs.image }}
+      image: ${{ needs.build-main.outputs.image }}
       nav-cluster: dev-gcp
       nav-environment: e2e
     secrets: inherit
