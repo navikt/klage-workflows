@@ -27,7 +27,8 @@ jobs:
 
   create-release:
     needs: deploy-to-prod
-    uses: ncipollo/release-action@main
-    with:
-      tag: ${{ inputs.tag }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ncipollo/release-action@main
+        with:
+          tag: ${{ inputs.tag }}
