@@ -49,11 +49,3 @@ jobs:
             VERSION=${CI}
       - name: Log Docker image tag
         run: echo "Docker image tag = ${{ steps.docker-build-push.outputs.tag }}"
-      - name: Post failures to Slack
-        if: failure()
-        run: |
-          curl -X POST --data-urlencode "payload={\"channel\": \"$CHANNEL\", \"text\": \"$MESSAGE\", \"icon_emoji\": \":ghost:\"}" $WEBHOOK_URL
-        env:
-          MESSAGE: "Bygg feilet"
-          CHANNEL: "#klage-notifications"
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
