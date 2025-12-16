@@ -26,7 +26,6 @@ jobs:
     secrets: inherit
 
   create-release:
-    needs: deploy-to-prod
     runs-on: ubuntu-latest
     steps:
       - uses: ncipollo/release-action@main
