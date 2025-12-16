@@ -6,6 +6,10 @@ on:
       image:
         required: true
         type: string
+      tag:
+        description: "Build tag"
+        type: string
+        required: true
       nav-cluster:
         required: false
         type: string
@@ -14,9 +18,14 @@ on:
 
 jobs:
   deploy-to-prod:
-    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
-    with:
-      image: ${{ inputs.image }}
-      nav-cluster: ${{ inputs.nav-cluster }}
-      nav-environment: prod
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
+        with:
+          image: ${{ inputs.image }}
+          nav-cluster: ${{ inputs.nav-cluster }}
+          nav-environment: prod
+        secrets: inherit
+      - uses: ncipollo/release-action@main
+        with:
+          tag: ${{ inputs.tag }}

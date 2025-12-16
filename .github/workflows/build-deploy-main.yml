@@ -13,6 +13,7 @@ jobs:
   build-main:
     uses: navikt/klage-workflows/.github/workflows/build-app.yml@main
     secrets: inherit
+
   deploy-main-to-dev:
     uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yml@main
     needs: build-main
@@ -26,4 +27,5 @@ jobs:
     needs: build-main
     secrets: inherit
     with:
+      tag: ${{ needs.build-main.outputs.tag }}
       image: ${{ needs.build-main.outputs.image }}
