@@ -80,14 +80,16 @@ jobs:
 
   deploy-main-to-dev-envs:
     uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yml@main
-    needs: [build-main, kabal-e2e-tests, kaka-e2e-tests]
+    needs: [build-main, kabal-e2e-tests, kaka-e2e-tests, kabin-e2e-tests, klang-e2e-tests]
+    if: ${{ !failure() && !cancelled() }}
     secrets: inherit
     with:
       image: ${{ needs.build-main.outputs.image }}
 
   deploy-main-to-prod:
     uses: navikt/klage-workflows/.github/workflows/deploy-prod.yml@main
-    needs: [build-main, kabal-e2e-tests, kaka-e2e-tests]
+    needs: [build-main, kabal-e2e-tests, kaka-e2e-tests, kabin-e2e-tests, klang-e2e-tests]
+    if: ${{ !failure() && !cancelled() }}
     secrets: inherit
     with:
       tag: ${{ needs.build-main.outputs.tag }}
