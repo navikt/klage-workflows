@@ -2,6 +2,11 @@ name: Build, deploy to e2e, run e2e, deploy to all dev envs and prod
 
 on:
   workflow_call:
+    inputs:
+      e2e-tests:
+        type: string
+        default: 'kabal,kaka,kabin,klang'
+        description: 'Comma-separated list of e2e tests to run'
 
 jobs:
   build-main:
@@ -20,6 +25,7 @@ jobs:
   kabal-e2e-tests:
     name: Kabal E2E tests
     needs: deploy-main-to-e2e
+    if: contains(inputs.e2e-tests, 'kabal')
     permissions:
       contents: read
       id-token: write
@@ -29,11 +35,11 @@ jobs:
         uses: navikt/kabal-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: ${{ inputs.e2e_tag }}
 
   kaka-e2e-tests:
     name: Kaka E2E tests
     needs: deploy-main-to-e2e
+    if: contains(inputs.e2e-tests, 'kaka')
     permissions:
       contents: read
       id-token: write
@@ -43,7 +49,34 @@ jobs:
         uses: navikt/kaka-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: ${{ inputs.e2e_tag }}
+
+  kabin-e2e-tests:
+    name: Kabin E2E tests
+    needs: deploy-main-to-e2e
+    if: contains(inputs.e2e-tests, 'kabin')
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/kabin-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
+
+  klang-e2e-tests:
+    name: Klang E2E tests
+    needs: deploy-main-to-e2e
+    if: contains(inputs.e2e-tests, 'klang')
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/klang-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
 
   deploy-main-to-dev-envs:
     uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yml@main
