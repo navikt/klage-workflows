@@ -35,6 +35,7 @@ jobs:
         uses: navikt/kabal-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: main
 
   kaka-e2e-tests:
     name: Kaka E2E tests
@@ -49,6 +50,7 @@ jobs:
         uses: navikt/kaka-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: main
 
   kabin-e2e-tests:
     name: Kabin E2E tests
@@ -63,6 +65,7 @@ jobs:
         uses: navikt/kabin-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: main
 
   klang-e2e-tests:
     name: Klang E2E tests
@@ -77,6 +80,7 @@ jobs:
         uses: navikt/klang-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: main
 
   deploy-main-to-dev-envs:
     uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yml@main
