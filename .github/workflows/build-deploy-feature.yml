@@ -1,0 +1,29 @@
+name: Build and deploy feature to a dev environment
+
+on:
+  workflow_call:
+    inputs:
+      build-tag:
+        required: true
+        type: string
+        description: "Tag/branch/ref to build"
+        default: main
+      nav-environment:
+        required: true
+        type: string
+
+jobs:
+  build-feature:
+    uses: navikt/klage-workflows/.github/workflows/build-app.yml@main
+    with:
+      build-tag: ${{ inputs.build-tag }}
+    secrets: inherit
+
+  deploy-feature-to-a-dev-environment:
+    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
+    needs: build-feature
+    with:
+      image: ${{ needs.build-feature.outputs.image }}
+      nav-cluster: dev-gcp
+      nav-environment: ${{ inputs.nav-environment }}
+    secrets: inherit
