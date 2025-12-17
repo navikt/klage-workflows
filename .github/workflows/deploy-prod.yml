@@ -27,6 +27,7 @@ jobs:
 
   create-release:
     name: Create release
+    needs: deploy-to-prod
     runs-on: ubuntu-latest
     steps:
       - uses: ncipollo/release-action@main
