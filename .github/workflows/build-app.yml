@@ -42,9 +42,8 @@ jobs:
         uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
-          team: klage # required
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # required, but is defined as an organization secret
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # required, but is defined as an organization variable
+          team: klage
+          tag: ${{ github.sha }}
           build_args: |
             VERSION=${CI}
       - name: Log Docker image tag
