@@ -26,6 +26,7 @@ jobs:
     secrets: inherit
 
   create-release:
+    name: Create release
     runs-on: ubuntu-latest
     steps:
       - uses: ncipollo/release-action@main

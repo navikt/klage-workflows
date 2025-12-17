@@ -18,7 +18,7 @@ jobs:
     secrets: inherit
 
   kabal-e2e-tests:
-    name: E2E
+    name: Kabal E2E tests
     needs: deploy-main-to-e2e
     permissions:
       contents: read
@@ -32,7 +32,7 @@ jobs:
           e2e_tag: ${{ inputs.e2e_tag }}
 
   kaka-e2e-tests:
-    name: E2E
+    name: Kaka E2E tests
     needs: deploy-main-to-e2e
     permissions:
       contents: read
