@@ -14,12 +14,14 @@ on:
 
 jobs:
   build-feature:
+    name: Build feature
     uses: navikt/klage-workflows/.github/workflows/build-app.yml@main
     with:
       build-tag: ${{ inputs.build-tag }}
     secrets: inherit
 
   deploy-feature-to-a-dev-environment:
+    name: Deploy feature ${{ inputs.build-tag }} to ${{ inputs.nav-environment }}
     uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
     needs: build-feature
     with:
