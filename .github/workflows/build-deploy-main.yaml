@@ -10,11 +10,11 @@ on:
 
 jobs:
   build-main:
-    uses: navikt/klage-workflows/.github/workflows/build-app.yml@main
+    uses: navikt/klage-workflows/.github/workflows/build-app.yaml@main
     secrets: inherit
 
   deploy-main-to-e2e:
-    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
+    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yaml@main
     needs: build-main
     with:
       image: ${{ needs.build-main.outputs.image }}
@@ -83,7 +83,7 @@ jobs:
           e2e_tag: main
 
   deploy-main-to-dev-envs:
-    uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yml@main
+    uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yaml@main
     needs: [build-main, kabal-e2e-tests, kaka-e2e-tests, kabin-e2e-tests, klang-e2e-tests]
     if: ${{ !failure() && !cancelled() }}
     secrets: inherit
@@ -91,7 +91,7 @@ jobs:
       image: ${{ needs.build-main.outputs.image }}
 
   deploy-main-to-prod:
-    uses: navikt/klage-workflows/.github/workflows/deploy-prod.yml@main
+    uses: navikt/klage-workflows/.github/workflows/deploy-prod.yaml@main
     needs: [build-main, kabal-e2e-tests, kaka-e2e-tests, kabin-e2e-tests, klang-e2e-tests]
     if: ${{ !failure() && !cancelled() }}
     secrets: inherit

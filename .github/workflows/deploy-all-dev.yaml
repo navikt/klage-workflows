@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy-to-dev:
-    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
+    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yaml@main
     strategy:
       matrix:
         environment: [dev,neon,argon]

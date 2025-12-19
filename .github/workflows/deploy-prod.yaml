@@ -18,7 +18,7 @@ on:
 
 jobs:
   deploy-to-prod:
-    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yml@main
+    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yaml@main
     with:
       image: ${{ inputs.image }}
       nav-cluster: ${{ inputs.nav-cluster }}
