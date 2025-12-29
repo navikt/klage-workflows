@@ -13,18 +13,18 @@ jobs:
     uses: navikt/klage-workflows/.github/workflows/build-app.yaml@main
     secrets: inherit
 
-  deploy-main-to-e2e:
+  deploy-main-to-dev:
     uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yaml@main
     needs: build-main
     with:
       image: ${{ needs.build-main.outputs.image }}
       nav-cluster: dev-gcp
-      nav-environment: e2e
+      nav-environment: dev
     secrets: inherit
 
   kabal-e2e-tests:
     name: Kabal E2E tests
-    needs: deploy-main-to-e2e
+    needs: deploy-main-to-dev
     if: contains(inputs.e2e-tests, 'kabal')
     permissions:
       contents: read
@@ -39,7 +39,7 @@ jobs:
 
   kaka-e2e-tests:
     name: Kaka E2E tests
-    needs: deploy-main-to-e2e
+    needs: deploy-main-to-dev
     if: contains(inputs.e2e-tests, 'kaka')
     permissions:
       contents: read
@@ -54,7 +54,7 @@ jobs:
 
   kabin-e2e-tests:
     name: Kabin E2E tests
-    needs: deploy-main-to-e2e
+    needs: deploy-main-to-dev
     if: contains(inputs.e2e-tests, 'kabin')
     permissions:
       contents: read
@@ -69,7 +69,7 @@ jobs:
 
   klang-e2e-tests:
     name: Klang E2E tests
-    needs: deploy-main-to-e2e
+    needs: deploy-main-to-dev
     if: contains(inputs.e2e-tests, 'klang')
     permissions:
       contents: read
@@ -81,14 +81,6 @@ jobs:
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
           e2e_tag: main
-
-  deploy-main-to-dev-envs:
-    uses: navikt/klage-workflows/.github/workflows/deploy-all-dev.yaml@main
-    needs: [build-main, kabal-e2e-tests, kaka-e2e-tests, kabin-e2e-tests, klang-e2e-tests]
-    if: ${{ !failure() && !cancelled() }}
-    secrets: inherit
-    with:
-      image: ${{ needs.build-main.outputs.image }}
 
   deploy-main-to-prod:
     uses: navikt/klage-workflows/.github/workflows/deploy-prod.yaml@main
