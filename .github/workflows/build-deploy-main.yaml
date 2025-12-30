@@ -6,7 +6,7 @@ on:
       e2e-tests:
         type: string
         default: 'kabal,kaka,kabin,klang'
-        description: 'Comma-separated list of e2e tests to run'
+        description: 'Comma-separated list of e2e tests to run. Leave empty to skip all e2e tests.'
 
 jobs:
   build-main:
@@ -22,69 +22,18 @@ jobs:
       nav-environment: dev
     secrets: inherit
 
-  kabal-e2e-tests:
-    name: Kabal E2E tests
+  e2e-tests:
+    if: inputs.e2e-tests != ''
+    uses: navikt/klage-workflows/.github/workflows/e2e-tests.yaml@main
     needs: deploy-main-to-dev
-    if: contains(inputs.e2e-tests, 'kabal')
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: E2E
-        uses: navikt/kabal-e2e-tests/.github/actions/run@main
-        with:
-          status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: main
-
-  kaka-e2e-tests:
-    name: Kaka E2E tests
-    needs: deploy-main-to-dev
-    if: contains(inputs.e2e-tests, 'kaka')
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: E2E
-        uses: navikt/kaka-e2e-tests/.github/actions/run@main
-        with:
-          status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: main
-
-  kabin-e2e-tests:
-    name: Kabin E2E tests
-    needs: deploy-main-to-dev
-    if: contains(inputs.e2e-tests, 'kabin')
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: E2E
-        uses: navikt/kabin-e2e-tests/.github/actions/run@main
-        with:
-          status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: main
-
-  klang-e2e-tests:
-    name: Klang E2E tests
-    needs: deploy-main-to-dev
-    if: contains(inputs.e2e-tests, 'klang')
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: E2E
-        uses: navikt/klang-e2e-tests/.github/actions/run@main
-        with:
-          status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: main
+    with:
+      e2e-tests: ${{ inputs.e2e-tests }}
+    secrets:
+      STATUS_API_KEY: ${{ secrets.STATUS_API_KEY }}
 
   deploy-main-to-prod:
     uses: navikt/klage-workflows/.github/workflows/deploy-prod.yaml@main
-    needs: [build-main, kabal-e2e-tests, kaka-e2e-tests, kabin-e2e-tests, klang-e2e-tests]
+    needs: [deploy-main-to-dev, e2e-tests]
     if: ${{ !failure() && !cancelled() }}
     secrets: inherit
     with:

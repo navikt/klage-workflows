@@ -1,0 +1,69 @@
+name: E2E Tests
+
+on:
+  workflow_call:
+    inputs:
+      e2e-tests:
+        type: string
+        default: 'kabal,kaka,kabin,klang'
+        description: 'Comma-separated list of e2e tests to run'
+    secrets:
+      STATUS_API_KEY:
+        required: true
+
+jobs:
+  kabal-e2e-tests:
+    name: Kabal E2E tests
+    if: contains(inputs.e2e-tests, 'kabal')
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/kabal-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: main
+
+  kaka-e2e-tests:
+    name: Kaka E2E tests
+    if: contains(inputs.e2e-tests, 'kaka')
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/kaka-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: main
+
+  kabin-e2e-tests:
+    name: Kabin E2E tests
+    if: contains(inputs.e2e-tests, 'kabin')
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/kabin-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: main
+
+  klang-e2e-tests:
+    name: Klang E2E tests
+    if: contains(inputs.e2e-tests, 'klang')
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: E2E
+        uses: navikt/klang-e2e-tests/.github/actions/run@main
+        with:
+          status_api_key: ${{ secrets.STATUS_API_KEY }}
+          e2e_tag: main

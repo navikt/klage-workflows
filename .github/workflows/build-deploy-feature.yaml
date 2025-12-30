@@ -1,4 +1,4 @@
-name: Build and deploy feature to a dev environment
+name: Build and deploy feature to dev
 
 on:
   workflow_call:
@@ -11,6 +11,10 @@ on:
       nav-environment:
         required: true
         type: string
+      e2e-tests:
+        type: string
+        default: 'kabal,kaka,kabin,klang'
+        description: 'Comma-separated list of e2e tests to run. Leave empty to skip all e2e tests.'
 
 jobs:
   build-feature:
@@ -20,7 +24,7 @@ jobs:
       build-tag: ${{ inputs.build-tag }}
     secrets: inherit
 
-  deploy-feature-to-a-dev-environment:
+  deploy-feature-to-dev:
     name: Deploy feature ${{ inputs.build-tag }} to ${{ inputs.nav-environment }}
     uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yaml@main
     needs: build-feature
@@ -29,3 +33,12 @@ jobs:
       nav-cluster: dev-gcp
       nav-environment: ${{ inputs.nav-environment }}
     secrets: inherit
+
+  e2e-tests:
+    if: inputs.e2e-tests != ''
+    needs: deploy-feature-to-dev
+    uses: navikt/klage-workflows/.github/workflows/e2e-tests.yaml@main
+    with:
+      e2e-tests: ${{ inputs.e2e-tests }}
+    secrets:
+      STATUS_API_KEY: ${{ secrets.STATUS_API_KEY }}
