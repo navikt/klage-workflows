@@ -14,7 +14,7 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: navikt/klage-workflows/.github/workflows/deploy-nais-app-with-custom-checkout.yaml@main
+      - uses: navikt/klage-workflows/.github/actions/deploy-nais-app-with-custom-checkout@main
         with:
           build-tag: ${{ github.sha }}
           nav-cluster: prod-gcp
@@ -36,9 +36,9 @@ jobs:
 
       - name: Tag Docker image with release version
         run: |
-          docker pull europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ github.sha }}
-          docker tag europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ github.sha }} europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ steps.version.outputs.version }}
-          docker push europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ steps.version.outputs.version }}
+          docker pull ${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}:${{ github.sha }}
+          docker tag ${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}:${{ github.sha }} ${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}:${{ steps.version.outputs.version }}
+          docker push ${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}:${{ steps.version.outputs.version }}
 
       - uses: ncipollo/release-action@main
         with:

@@ -1,0 +1,15 @@
+name: Create GitHub Release
+description: Create a GitHub release with a tag
+
+inputs:
+  tag:
+    description: 'Tag for the release'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Create release
+      uses: ncipollo/release-action@main
+      with:
+        tag: ${{ inputs.tag }}

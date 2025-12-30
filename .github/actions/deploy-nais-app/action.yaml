@@ -1,0 +1,30 @@
+name: Deploy NAIS App
+description: Deploy a NAIS application to a cluster
+
+inputs:
+  image:
+    description: 'Full Docker image path including tag'
+    required: true
+  nav-cluster:
+    description: 'NAIS cluster to deploy to'
+    required: true
+  nav-environment:
+    description: 'Environment name (used for config file selection)'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout nais config
+      uses: actions/checkout@v5
+      with:
+        sparse-checkout: |
+          nais/**
+        sparse-checkout-cone-mode: false
+    - name: Deploy to ${{ inputs.nav-environment }}
+      uses: nais/deploy/actions/deploy@v2
+      env:
+        CLUSTER: ${{ inputs.nav-cluster }}
+        RESOURCE: nais/nais.yaml
+        VARS: nais/${{ inputs.nav-environment }}-config.yaml
+        VAR: image=${{ inputs.image }}

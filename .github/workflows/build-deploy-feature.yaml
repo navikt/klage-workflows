@@ -17,26 +17,33 @@ on:
         description: 'Comma-separated list of e2e tests to run. Leave empty to skip all e2e tests.'
 
 jobs:
-  build-feature:
-    name: Build feature
-    uses: navikt/klage-workflows/.github/workflows/build-app.yaml@main
-    with:
-      build-tag: ${{ inputs.build-tag }}
-    secrets: inherit
-
-  deploy-feature-to-dev:
-    name: Deploy feature ${{ inputs.build-tag }} to ${{ inputs.nav-environment }}
-    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yaml@main
-    needs: build-feature
-    with:
-      image: ${{ needs.build-feature.outputs.image }}
-      nav-cluster: dev-gcp
-      nav-environment: ${{ inputs.nav-environment }}
-    secrets: inherit
+  build-and-deploy-feature:
+    name: Build and deploy feature to ${{ inputs.nav-environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+      tag: ${{ steps.build.outputs.tag }}
+    steps:
+      - name: Build app
+        id: build
+        uses: navikt/klage-workflows/.github/actions/build-app@main
+        with:
+          build-tag: ${{ inputs.build-tag }}
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to ${{ inputs.nav-environment }}
+        uses: navikt/klage-workflows/.github/actions/deploy-nais-app@main
+        with:
+          image: ${{ steps.build.outputs.image }}
+          nav-cluster: dev-gcp
+          nav-environment: ${{ inputs.nav-environment }}
 
   e2e-tests:
     if: inputs.e2e-tests != ''
-    needs: deploy-feature-to-dev
+    needs: build-and-deploy-feature
     uses: navikt/klage-workflows/.github/workflows/e2e-tests.yaml@main
     with:
       e2e-tests: ${{ inputs.e2e-tests }}

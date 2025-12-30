@@ -1,0 +1,40 @@
+name: Deploy NAIS App with Custom Checkout
+description: Deploy a NAIS application to a cluster, checking out a specific ref for nais config
+
+inputs:
+  build-tag:
+    description: 'Tag/branch/ref to checkout for nais config'
+    required: true
+  nav-cluster:
+    description: 'NAIS cluster to deploy to'
+    required: true
+  nav-environment:
+    description: 'Environment name (used for config file selection)'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout nais config
+      uses: actions/checkout@v5
+      with:
+        ref: ${{ inputs.build-tag }}
+        sparse-checkout: |
+          nais/**
+        sparse-checkout-cone-mode: false
+    - name: Check if nais/${{ inputs.nav-environment }}-config.yaml exists
+      id: check-yaml
+      shell: bash
+      run: echo "file-exists=$(test -f nais/${{ inputs.nav-environment }}-config.yaml && echo 'config_exists' || echo 'config_not_exists')" >> $GITHUB_OUTPUT
+    - name: Deploy to ${{ inputs.nav-environment }}
+      uses: nais/deploy/actions/deploy@v2
+      if: ${{ steps.check-yaml.outputs.file-exists == 'config_exists' }}
+      env:
+        CLUSTER: ${{ inputs.nav-cluster }}
+        RESOURCE: nais/nais.yaml
+        VARS: nais/${{ inputs.nav-environment }}-config.yaml
+        VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ inputs.build-tag }}
+    - name: No config files detected - unable to deploy
+      if: ${{ steps.check-yaml.outputs.file-exists != 'config_exists' }}
+      shell: bash
+      run: echo "::warning title=Unable to deploy::Could not find nais/${{ inputs.nav-environment }}-config.yaml"

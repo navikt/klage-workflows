@@ -9,33 +9,54 @@ on:
         description: 'Comma-separated list of e2e tests to run. Leave empty to skip all e2e tests.'
 
 jobs:
-  build-main:
-    uses: navikt/klage-workflows/.github/workflows/build-app.yaml@main
-    secrets: inherit
-
-  deploy-main-to-dev:
-    uses: navikt/klage-workflows/.github/workflows/deploy-nais-app.yaml@main
-    needs: build-main
-    with:
-      image: ${{ needs.build-main.outputs.image }}
-      nav-cluster: dev-gcp
-      nav-environment: dev
-    secrets: inherit
+  build-and-deploy-to-dev:
+    name: Build and deploy to dev
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+      tag: ${{ steps.build.outputs.tag }}
+    steps:
+      - name: Build app
+        id: build
+        uses: navikt/klage-workflows/.github/actions/build-app@main
+        with:
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to dev
+        uses: navikt/klage-workflows/.github/actions/deploy-nais-app@main
+        with:
+          image: ${{ steps.build.outputs.image }}
+          nav-cluster: dev-gcp
+          nav-environment: dev
 
   e2e-tests:
     if: inputs.e2e-tests != ''
     uses: navikt/klage-workflows/.github/workflows/e2e-tests.yaml@main
-    needs: deploy-main-to-dev
+    needs: build-and-deploy-to-dev
     with:
       e2e-tests: ${{ inputs.e2e-tests }}
     secrets:
       STATUS_API_KEY: ${{ secrets.STATUS_API_KEY }}
 
-  deploy-main-to-prod:
-    uses: navikt/klage-workflows/.github/workflows/deploy-prod.yaml@main
-    needs: [deploy-main-to-dev, e2e-tests]
+  deploy-to-prod:
+    name: Deploy to prod and create release
+    needs: [build-and-deploy-to-dev, e2e-tests]
     if: ${{ !failure() && !cancelled() }}
-    secrets: inherit
-    with:
-      tag: ${{ needs.build-main.outputs.tag }}
-      image: ${{ needs.build-main.outputs.image }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Deploy to prod
+        uses: navikt/klage-workflows/.github/actions/deploy-nais-app@main
+        with:
+          image: ${{ needs.build-and-deploy-to-dev.outputs.image }}
+          nav-cluster: prod-gcp
+          nav-environment: prod
+      - name: Create release
+        uses: navikt/klage-workflows/.github/actions/create-release@main
+        with:
+          tag: ${{ needs.build-and-deploy-to-dev.outputs.tag }}

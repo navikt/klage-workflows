@@ -1,0 +1,57 @@
+name: Build App
+description: Build and push Docker image for a Java/Gradle application
+
+inputs:
+  build-tag:
+    description: 'Tag/branch/ref to build'
+    required: false
+    default: main
+  gradle-encryption-key:
+    description: 'Gradle cache encryption key'
+    required: true
+  github-token:
+    description: 'GitHub token for Gradle'
+    required: true
+
+outputs:
+  tag:
+    description: 'Docker image tag'
+    value: ${{ steps.docker-build-push.outputs.tag }}
+  image:
+    description: 'Full Docker image path'
+    value: ${{ steps.docker-build-push.outputs.image }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      with:
+        ref: ${{ inputs.build-tag }}
+    - name: Install Java 21
+      uses: actions/setup-java@v5
+      with:
+        java-version: 21
+        distribution: temurin
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
+      with:
+        cache-overwrite-existing: true
+        cache-encryption-key: ${{ inputs.gradle-encryption-key }}
+    - name: Build and test
+      shell: bash
+      run: ./gradlew build
+      env:
+        ORG_GRADLE_PROJECT_githubUser: x-access-token
+        ORG_GRADLE_PROJECT_githubPassword: ${{ inputs.github-token }}
+    - name: Build & push Docker image
+      uses: nais/docker-build-push@v0
+      id: docker-build-push
+      with:
+        team: klage
+        tag: ${{ github.sha }}
+        build_args: |
+          VERSION=${CI}
+    - name: Log Docker image tag
+      shell: bash
+      run: echo "Docker image tag = ${{ steps.docker-build-push.outputs.tag }}"
