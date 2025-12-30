@@ -1,4 +1,4 @@
-name: Deploy build-tag to prod-<cluster>
+name: Deploy build-tag to prod
 
 on:
   workflow_call:
