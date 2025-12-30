@@ -6,7 +6,7 @@ on:
       e2e-tests:
         type: string
         default: 'kabal,kaka,kabin,klang'
-        description: 'Comma-separated list of e2e tests to run. Leave empty to skip all e2e tests.'
+        description: 'Comma-separated list of e2e tests to run. Set to "none" to skip all e2e tests.'
 
 jobs:
   build-and-deploy-feature:
@@ -31,7 +31,7 @@ jobs:
           nav-environment: dev
 
   e2e-tests:
-    if: inputs.e2e-tests != ''
+    if: inputs.e2e-tests != 'none'
     needs: build-and-deploy-feature
     uses: navikt/klage-workflows/.github/workflows/e2e-tests.yaml@main
     with:
