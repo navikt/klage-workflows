@@ -34,8 +34,12 @@ jobs:
         run: |
           IMAGE=${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}
           DIGEST=$(crane digest ${IMAGE}:${{ github.sha }})
-          VERSION=$(crane ls ${IMAGE} --filter=digest=${DIGEST} | grep -E '^[0-9]{4}\.[0-9]{2}\.[0-9]{2}' | head -1)
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          for TAG in $(crane ls ${IMAGE} | grep -E '^[0-9]{4}\.[0-9]{2}\.[0-9]{2}'); do
+            if [ "$(crane digest ${IMAGE}:${TAG})" = "${DIGEST}" ]; then
+              echo "version=${TAG}" >> $GITHUB_OUTPUT
+              break
+            fi
+          done
 
       - uses: ncipollo/release-action@main
         with:
