@@ -3,11 +3,6 @@ name: Build and deploy feature to dev
 on:
   workflow_call:
     inputs:
-      build-tag:
-        required: true
-        type: string
-        description: "Tag/branch/ref to build"
-        default: main
       e2e-tests:
         type: string
         default: 'kabal,kaka,kabin,klang'
@@ -25,7 +20,7 @@ jobs:
         id: build
         uses: navikt/klage-workflows/.github/actions/build-app@main
         with:
-          build-tag: ${{ inputs.build-tag }}
+          build-tag: ''
           gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy to ${{ inputs.nav-environment }}

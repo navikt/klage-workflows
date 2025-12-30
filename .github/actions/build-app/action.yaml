@@ -27,7 +27,7 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v5
       with:
-        ref: ${{ inputs.build-tag }}
+        ref: ${{ inputs.build-tag == '' && github.ref_name || inputs.build-tag }}
     - name: Install Java 21
       uses: actions/setup-java@v5
       with:
