@@ -20,25 +20,22 @@ jobs:
           nav-cluster: prod-gcp
           nav-environment: prod
 
-      - name: Generate release version
-        id: version
-        run: |
-          TIME=$(TZ="UTC" date +%Y.%m.%d-%H.%M)
-          COMMIT=$(git rev-parse --short=7 HEAD)
-          VERSION=$TIME-$COMMIT
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-
       - name: Login to image registry
         id: image-registry
         uses: nais/login@v0
         with:
           team: klage
 
-      - name: Tag Docker image with release version
+      - name: Install crane
+        uses: imjasonh/setup-crane@v0.4
+
+      - name: Get version tag from image
+        id: version
         run: |
-          docker pull ${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}:${{ github.sha }}
-          docker tag ${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}:${{ github.sha }} ${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}:${{ steps.version.outputs.version }}
-          docker push ${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}:${{ steps.version.outputs.version }}
+          IMAGE=${{ steps.image-registry.outputs.registry }}/${{ github.event.repository.name }}
+          DIGEST=$(crane digest ${IMAGE}:${{ github.sha }})
+          VERSION=$(crane ls ${IMAGE} --filter=digest=${DIGEST} | grep -E '^[0-9]{4}\.[0-9]{2}\.[0-9]{2}' | head -1)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - uses: ncipollo/release-action@main
         with:
