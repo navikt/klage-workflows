@@ -38,7 +38,7 @@ jobs:
         uses: navikt/kaka-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: main
+          e2e_tag: latest
 
   kabin-e2e-tests:
     name: Kabin E2E tests
@@ -52,7 +52,7 @@ jobs:
         uses: navikt/kabin-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: main
+          e2e_tag: latest
 
   klang-e2e-tests:
     name: Klang E2E tests
@@ -66,4 +66,4 @@ jobs:
         uses: navikt/klang-e2e-tests/.github/actions/run@main
         with:
           status_api_key: ${{ secrets.STATUS_API_KEY }}
-          e2e_tag: main
+          e2e_tag: latest
