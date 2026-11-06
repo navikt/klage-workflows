@@ -6,6 +6,10 @@ inputs:
     description: 'Tag/branch/ref to build'
     required: false
     default: main
+  java-version:
+    description: 'Java version used for the build JDK'
+    required: false
+    default: '21'
   gradle-encryption-key:
     description: 'Gradle cache encryption key'
     required: true
@@ -28,10 +32,10 @@ runs:
       uses: actions/checkout@v5
       with:
         ref: ${{ inputs.build-tag == '' && github.ref_name || inputs.build-tag }}
-    - name: Install Java 21
+    - name: Install build JDK
       uses: actions/setup-java@v5
       with:
-        java-version: 21
+        java-version: ${{ inputs.java-version }}
         distribution: temurin
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v5

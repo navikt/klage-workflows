@@ -7,6 +7,11 @@ on:
         type: string
         default: 'kabal,kaka,kabin,klang'
         description: 'Comma-separated list of e2e tests to run. Set to "none" to skip all e2e tests.'
+      java-version:
+        type: string
+        required: false
+        default: '21'
+        description: 'Java version used for the build JDK.'
 
 jobs:
   build-and-deploy-feature:
@@ -21,6 +26,7 @@ jobs:
         uses: navikt/klage-workflows/.github/actions/build-app@main
         with:
           build-tag: ''
+          java-version: ${{ inputs.java-version }}
           gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy to ${{ inputs.nav-environment }}
