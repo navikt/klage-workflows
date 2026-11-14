@@ -11,6 +11,10 @@ inputs:
   nav-environment:
     description: 'Environment name (used for config file selection)'
     required: true
+  timeout:
+    description: 'How long nais deploy waits for the rollout to finish (e.g. 10m, 20m)'
+    required: false
+    default: '10m'
 
 runs:
   using: composite
@@ -28,3 +32,4 @@ runs:
         RESOURCE: nais/nais.yaml
         VARS: nais/${{ inputs.nav-environment }}-config.yaml
         VAR: image=${{ inputs.image }}
+        TIMEOUT: ${{ inputs.timeout }}

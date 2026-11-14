@@ -2,6 +2,12 @@ name: Manual deploy of main to prod
 
 on:
   workflow_call:
+    inputs:
+      prod-deploy-timeout:
+        type: string
+        required: false
+        default: '10m'
+        description: 'How long nais deploy waits for the prod rollout to finish (e.g. 20m).'
 
 run-name: Prod deploy of ${{ github.ref_name }}
 
@@ -19,6 +25,7 @@ jobs:
           build-tag: ${{ github.sha }}
           nav-cluster: prod-gcp
           nav-environment: prod
+          timeout: ${{ inputs.prod-deploy-timeout }}
 
       - name: Login to image registry
         id: image-registry

@@ -12,6 +12,11 @@ on:
         required: false
         default: '21'
         description: 'Java version used for the build JDK.'
+      prod-deploy-timeout:
+        type: string
+        required: false
+        default: '10m'
+        description: 'How long nais deploy waits for the prod rollout to finish (e.g. 20m).'
 
 jobs:
   build-and-deploy-to-dev:
@@ -62,6 +67,7 @@ jobs:
           image: ${{ needs.build-and-deploy-to-dev.outputs.image }}
           nav-cluster: prod-gcp
           nav-environment: prod
+          timeout: ${{ inputs.prod-deploy-timeout }}
       - name: Create release
         uses: navikt/klage-workflows/.github/actions/create-release@main
         with:

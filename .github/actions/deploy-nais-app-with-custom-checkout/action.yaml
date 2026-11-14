@@ -11,6 +11,10 @@ inputs:
   nav-environment:
     description: 'Environment name (used for config file selection)'
     required: true
+  timeout:
+    description: 'How long nais deploy waits for the rollout to finish (e.g. 10m, 20m)'
+    required: false
+    default: '10m'
 
 runs:
   using: composite
@@ -34,6 +38,7 @@ runs:
         RESOURCE: nais/nais.yaml
         VARS: nais/${{ inputs.nav-environment }}-config.yaml
         VAR: image=europe-north1-docker.pkg.dev/nais-management-233d/klage/${{ github.event.repository.name }}:${{ inputs.build-tag }}
+        TIMEOUT: ${{ inputs.timeout }}
     - name: No config files detected - unable to deploy
       if: ${{ steps.check-yaml.outputs.file-exists != 'config_exists' }}
       shell: bash
