@@ -27,7 +27,7 @@ jobs:
           team: klage
 
       - name: Install crane
-        uses: imjasonh/setup-crane@v0.4
+        uses: imjasonh/setup-crane@v0.7
 
       - name: Get version tag from image
         id: version
@@ -56,6 +56,6 @@ jobs:
             fi
           done
 
-      - uses: ncipollo/release-action@main
+      - uses: ncipollo/release-action@v1.21.0
         with:
           tag: ${{ steps.version.outputs.version }}

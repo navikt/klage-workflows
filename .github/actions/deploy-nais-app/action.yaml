@@ -16,13 +16,13 @@ runs:
   using: composite
   steps:
     - name: Checkout nais config
-      uses: actions/checkout@v5
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         sparse-checkout: |
           nais/**
         sparse-checkout-cone-mode: false
     - name: Deploy to ${{ inputs.nav-environment }}
-      uses: nais/deploy/actions/deploy@v2
+      uses: nais/deploy/actions/deploy@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50 # v3
       env:
         CLUSTER: ${{ inputs.nav-cluster }}
         RESOURCE: nais/nais.yaml

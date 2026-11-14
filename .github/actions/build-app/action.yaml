@@ -29,16 +29,16 @@ runs:
   using: composite
   steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         ref: ${{ inputs.build-tag == '' && github.ref_name || inputs.build-tag }}
     - name: Install build JDK
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
       with:
         java-version: ${{ inputs.java-version }}
         distribution: temurin
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v5
+      uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
       with:
         cache-overwrite-existing: true
         cache-encryption-key: ${{ inputs.gradle-encryption-key }}
@@ -49,7 +49,7 @@ runs:
         ORG_GRADLE_PROJECT_githubUser: x-access-token
         ORG_GRADLE_PROJECT_githubPassword: ${{ inputs.github-token }}
     - name: Build & push Docker image
-      uses: nais/docker-build-push@v0
+      uses: nais/docker-build-push@588f76a6f45aeb1e75d5e8417ec6ef6d79b2b39f # v0
       id: docker-build-push
       with:
         team: klage
