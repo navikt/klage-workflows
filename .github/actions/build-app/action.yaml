@@ -38,7 +38,7 @@ runs:
         java-version: ${{ inputs.java-version }}
         distribution: temurin
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
+      uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
       with:
         cache-overwrite-existing: true
         cache-encryption-key: ${{ inputs.gradle-encryption-key }}
@@ -49,7 +49,7 @@ runs:
         ORG_GRADLE_PROJECT_githubUser: x-access-token
         ORG_GRADLE_PROJECT_githubPassword: ${{ inputs.github-token }}
     - name: Build & push Docker image
-      uses: nais/docker-build-push@588f76a6f45aeb1e75d5e8417ec6ef6d79b2b39f # v0
+      uses: nais/docker-build-push@6394144a53cad0332745f24a8302f5efaf81719a # v1.0.0
       id: docker-build-push
       with:
         team: klage
